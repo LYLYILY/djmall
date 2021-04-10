@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.user.mapper.UserMapper">
+    <select id="findUserAll" resultType="com.dj.mall.user.mapper.bo.UserBO">
+        SELECT
+            au.id,
+            au.user_name,
+            au.user_phone,
+            au.user_sex,
+            au.user_status,
+            au.create_time,
+            au.last_login_time,
+            au.nike_name,
+            au.user_email,
+            ar.role_name AS user_rank,
+            di.dict_name AS user_sex_show,
+            dii.dict_name AS user_status_show
+        FROM
+            djmall_auth_user au
+                LEFT JOIN djmall_auth_user_role aur ON au.id = aur.user_id
+                LEFT JOIN djmall_auth_role ar ON aur.role_id = ar.id
+                LEFT JOIN djmall_dict di ON au.user_sex = di.`code`
+                LEFT JOIN djmall_dict dii ON au.user_status = dii.`code`
+        <where>
+            <if test="queryNameOrPhoneOrEmail != null and queryNameOrPhoneOrEmail != ''">
+                AND
+                    (au.user_name like "%"#{queryNameOrPhoneOrEmail}"%"
+                OR
+                     au.user_phone = #{queryNameOrPhoneOrEmail}
+                OR
+                     au.user_email = #{queryNameOrPhoneOrEmail})
+            </if>
+                <if test="queryRank != null">
+                    AND ar.id = #{queryRank}
+                </if>
+                <if test="userSex != null and userSex != ''">
+                    AND au.user_sex = #{userSex}
+                </if>
+                <if test="userStatus != null and userStatus != ''">
+                    AND au.user_status = #{userStatus}
+                </if>
+        </where>
+                ORDER BY au.id DESC
+    </select>
+
+    <select id="getLeft" resultType="com.dj.mall.user.mapper.bo.MenuBO">
+        SELECT
+            dar.*
+        FROM
+            djmall_auth_user_role da
+                LEFT JOIN djmall_auth_role_resource dr ON da.role_id = dr.role_id
+                LEFT JOIN djmall_auth_resource dar ON dar.id = dr.resource_id
+        WHERE da.user_id = #{id}
+    </select>
+</mapper>

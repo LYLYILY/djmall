@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.auth.mapper.resource.ResourceMapper">
+
+    <sql id="RESOURCE">
+        id,
+        parent_id,
+        resource_name,
+        url,
+        resource_code,
+        resource_type
+    </sql>
+
+    <select id="findResource" resultType="com.dj.mall.auth.mapper.bo.ResourceBO">
+        select
+        <include refid="RESOURCE"/>
+        from
+        djmall_auth_resource
+    </select>
+
+
+</mapper>
