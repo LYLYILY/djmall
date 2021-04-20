@@ -8,15 +8,11 @@ import lombok.Data;
 public class RoleResourceEntity {
 
     /**
-     *
-     *  @Date: 2021/1/17 16:39
      *  角色ID
      */
     private Integer roleId;
 
     /**
-     *
-     *  @Date: 2021/1/17 16:39
      *  资源ID
      */
     private Integer resourceId;

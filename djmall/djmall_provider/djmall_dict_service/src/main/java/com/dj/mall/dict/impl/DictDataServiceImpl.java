@@ -12,10 +12,17 @@ import com.dj.mall.dict.entity.DictDataEntity;
 import com.dj.mall.dict.mapper.DictDataMapper;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class DictDataServiceImpl extends ServiceImpl<DictDataMapper, DictDataEntity> implements DictDataService {
 
+    /**
+     * 根据parentcode查找字典名
+     * @param system
+     * @return
+     * @throws Exception
+     */
     @Override
     public List<DictDataDTO> findDictNameByParentCode(String system) throws Exception {
         QueryWrapper<DictDataEntity> queryWrapper = new QueryWrapper<>();
@@ -24,12 +31,23 @@ public class DictDataServiceImpl extends ServiceImpl<DictDataMapper, DictDataEnt
         return DozerUtil.mapList(list, DictDataDTO.class);
     }
 
+    /**
+     * 字典查询
+     * @return
+     * @throws Exception
+     */
     @Override
     public List<DictDataDTO> findDictDataAll() throws Exception {
         List<DictDataEntity> list = super.list();
         return DozerUtil.mapList(list, DictDataDTO.class);
     }
 
+    /**
+     * 根据code查找字典名
+     * @param code
+     * @return
+     * @throws Exception
+     */
     @Override
     public DictDataDTO findDictNameByCode(String code) throws Exception {
         QueryWrapper<DictDataEntity> queryWrapper = new QueryWrapper<>();
@@ -38,6 +56,12 @@ public class DictDataServiceImpl extends ServiceImpl<DictDataMapper, DictDataEnt
         return DozerUtil.map(dictDataEntity, DictDataDTO.class);
     }
 
+    /**
+     * 字典修改
+     * @param dictDataDTO
+     * @throws Exception
+     * @throws BusinessException
+     */
     @Override
     public void update(DictDataDTO dictDataDTO) throws Exception,BusinessException {
         QueryWrapper<DictDataEntity> queryWrapper = new QueryWrapper<>();
@@ -52,6 +76,11 @@ public class DictDataServiceImpl extends ServiceImpl<DictDataMapper, DictDataEnt
         super.update(updateWrapper);
     }
 
+    /**
+     * 字典新增
+     * @param dictDataDTO
+     * @throws Exception
+     */
     @Override
     public void add(DictDataDTO dictDataDTO) throws Exception {
         QueryWrapper<DictDataEntity> queryWrapper = new QueryWrapper<>();
@@ -66,9 +95,17 @@ public class DictDataServiceImpl extends ServiceImpl<DictDataMapper, DictDataEnt
         if (dictDataEntity1 != null){
             throw new BusinessException("此CODE已存在");
         }
+        dictDataDTO.setCode(dictDataDTO.getCode().toUpperCase());
+        dictDataDTO.setParentCode(dictDataDTO.getParentCode().toUpperCase());
         super.save(DozerUtil.map(dictDataDTO, DictDataEntity.class));
     }
 
+    /**
+     * 查询字典数据Sex
+     * @param sex
+     * @return
+     * @throws Exception
+     */
     @Override
     public List<DictDataDTO> findDictDataSex(String sex) throws Exception {
         QueryWrapper<DictDataEntity> queryWrapper = new QueryWrapper<>();

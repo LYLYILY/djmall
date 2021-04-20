@@ -73,20 +73,21 @@ public class UserBO {
     /**
      * 注册时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;
 
     /**
      * 最终登陆时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime lastLoginTime;
 
     /**
      *  模糊查询-用户名-邮箱-手机号
      */
     private String queryNameOrPhoneOrEmail;
+
+    /**
+     * 加密用的盐
+     */
+    private String salt;
 
 }

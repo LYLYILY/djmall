@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -74,6 +75,7 @@
         $("#url").val(selectedNode.url);
         $("#resourceCode").val(selectedNode.resourceCode);
         $("#resourceType").val(selectedNode.resourceType);
+        $("#myModal").modal();
     }
 
     function update(){
@@ -109,10 +111,18 @@
 
 </SCRIPT>
 <body>
-<input type="button" class="btn btn-info" value="新增资源" onclick="add()">
-<input type="button" class="btn btn-info" value="修改" data-toggle="modal" data-target="#myModal" onclick="toUpdate()">
-<input type="button" class="btn btn-info" value="删除" onclick="del()">
+<shiro:hasPermission name="RESOURCE_ADD_BTN">
+    <input type="button" class="btn btn-info" value="新增资源" onclick="add()">
+</shiro:hasPermission>
+<shiro:hasPermission name="RESOURCE_UPDATE_BTN">
+    <input type="button" class="btn btn-info" value="修改" onclick="toUpdate()">
+</shiro:hasPermission>
+<shiro:hasPermission name="RESOURCE_DEL_BTN">
+    <input type="button" class="btn btn-info" value="删除" onclick="del()">
+</shiro:hasPermission>
 <h1 id="treeDemo" class="ztree"></h1>
+
+<%----%>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -134,7 +144,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <input type="button" class="btn btn-primary" value="保存" onclick="update()"></input>
+                <shiro:hasPermission name="RESOURCE_UPDATE_BTN">
+                <input type="button" class="btn btn-primary" value="保存" onclick="update()">
+                </shiro:hasPermission>
             </div>
         </div>
     </div>

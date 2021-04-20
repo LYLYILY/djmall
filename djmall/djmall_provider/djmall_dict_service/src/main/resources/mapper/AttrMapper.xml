@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.dict.mapper.AttrMapper">
+    <select id="findAttrAll" resultType="com.dj.mall.dict.mapper.bo.AttrBO">
+        SELECT
+            ddpa.id,
+            ddpa.attr_name,
+            GROUP_CONCAT(ddpav.attr_value) AS attrValue
+        FROM
+            djmall_dict_product_attr ddpa
+                LEFT JOIN djmall_dict_product_attr_value ddpav ON ddpa.id = ddpav.attr_id
+        GROUP BY
+            ddpa.attr_name
+        ORDER BY ddpa.id ASC
+    </select>
+</mapper>

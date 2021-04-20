@@ -9,13 +9,11 @@ import java.util.List;
 public class RoleVOReq implements Serializable {
 
     /**
-     *  @author: ly
      *  角色ID
      */
     private Integer id;
 
     /**
-     *  @author: ly
      *  角色名
      */
     private String roleName;

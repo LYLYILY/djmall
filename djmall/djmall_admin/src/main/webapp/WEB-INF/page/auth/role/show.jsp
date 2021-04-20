@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,9 +27,9 @@
                     html+="<td>"+result.data[i].id+"</td>"
                     html+="<td>"+result.data[i].roleName+"</td>"
                     html+="<td>"
-                    html+="<input type='button' value='关联资源' onclick='gl("+result.data[i].id+")'>";
-                    html+="<input type='button' value='编辑' onclick='updateRole("+result.data[i].id+")'>";
-                    html+="<input type='button' value='删除' onclick='del("+result.data[i].id+")'>";
+                    html+="<shiro:hasPermission name="ROLE_RESOURCE_BTN"><input type='button' value='关联资源' onclick='gl("+result.data[i].id+")'></shiro:hasPermission>";
+                    html+="<shiro:hasPermission name="ROLE_UPDATE_BTN"><input type='button' value='编辑' onclick='updateRole("+result.data[i].id+")'></shiro:hasPermission>";
+                    html+="<shiro:hasPermission name="ROLE_DEL_BTN"><input type='button' value='删除' onclick='del("+result.data[i].id+")'></shiro:hasPermission>";
                     html+="</td>";
                     html+="</tr>";
                 }
@@ -71,7 +72,9 @@
 
 </script>
 <body>
+<shiro:hasPermission name="ROLE_ADD_BTN">
 <input type="button" value="新增" onclick="insertRole()">
+</shiro:hasPermission>
 <table border="1">
     <tr>
         <td>ID</td>

@@ -1,11 +1,5 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: DJ
-  Date: 2021/1/14
-  Time: 17:54
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -44,7 +38,9 @@
         <option value="1">菜单</option>
         <option value="2">按钮</option>
     </select><br>
+    <shiro:hasPermission name="RESOURCE_ADD_BTN">
     <input type="button" onclick="add()" value="新增">
+    </shiro:hasPermission>
 </form>
 </body>
 </html>

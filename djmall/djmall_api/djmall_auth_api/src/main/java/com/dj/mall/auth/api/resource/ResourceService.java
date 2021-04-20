@@ -9,25 +9,34 @@ import java.util.List;
 public interface ResourceService {
 
     /**
-     *  展示资源列表
+     * 展示资源
+     * @return
+     * @throws Exception
      */
     List<ResourceDTO> findResource() throws Exception;
 
     /**
-     *  根据ID查找资源
+     * 根据id查资源名称
+     * @param id 资源id
+     * @return
+     * @throws Exception
      */
     ResourceDTO findResourceNameById(Integer id) throws Exception;
 
     /**
-     *  添加资源
+     * 新增资源
+     * @param map
+     * @throws Exception
      */
     void addResource(ResourceDTO map) throws BusinessException;
 
     /**
-     *  修改资源
+     * 修改资源
+     * @param map
+     * @throws Exception
      */
     void updateResource(ResourceDTO map) throws Exception, BusinessException;
 
 
-
+    List<ResourceDTO> findResourceById(List<Integer> addRedis) throws Exception;
 }

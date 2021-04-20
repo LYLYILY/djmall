@@ -67,6 +67,14 @@ public class UserDTO implements Serializable {
      */
     private Integer roleId;
 
+    /**
+     * 左侧菜单 - 用户角色对应资源
+     */
     List<MenuDTO> resourceList;
+
+    /**
+     * 加密用的盐
+     */
+    private String salt;
 
 }

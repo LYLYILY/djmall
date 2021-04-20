@@ -1,7 +1,9 @@
 package com.dj.mall.admin.config;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dj.mall.common.base.BusinessException;
 import com.dj.mall.common.base.ResultModel;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -79,7 +81,7 @@ public class CustomExceptionHandler {
      * @param ex
      * @return
      */
-     /*@ExceptionHandler(UnauthorizedException.class)
+     @ExceptionHandler(UnauthorizedException.class)
      public void unauthorizedExceptionHandler(HttpServletRequest request, HttpServletResponse response, UnauthorizedException ex) {
          ex.printStackTrace();
          try {
@@ -94,5 +96,5 @@ public class CustomExceptionHandler {
          } catch (Exception e) {
              e.printStackTrace();
          }
-     }*/
+     }
 }

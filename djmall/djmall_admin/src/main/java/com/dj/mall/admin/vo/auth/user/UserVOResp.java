@@ -48,5 +48,8 @@ public class UserVOResp {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime lastLoginTime;
 
-
+    /**
+     * 加密用的盐
+     */
+    private String salt;
 }

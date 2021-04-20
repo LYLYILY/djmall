@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +10,6 @@
     <script type="text/javascript" src="<%=request.getContextPath()%>/static/jq/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/static/layer/layer.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/static/validate/jquery.validate.js"></script>
-    <script type="text/javascript" src="<%=request.getContextPath()%>/static/my97/WdatePicker.js"></script>
     <title></title>
 </head>
 <body align="center">
@@ -38,7 +38,9 @@
             </td>
         </tr>
     </table>
+    <shiro:hasPermission name="USER_UPDATE_BTN">
     <input type="submit" class="layui-btn layui-btn-sm" value="修改">
+    </shiro:hasPermission>
 </form>
 </body>
 <script type="text/javascript">

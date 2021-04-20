@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +16,9 @@
 <form id="fm">
     <label for="roleName">角色名</label>
     <input id="roleName" name="roleName" type="text"><br>
+    <shiro:hasPermission name="ROLE_ADD_BTN">
     <input class="submit" type="submit" value="提交">
+    </shiro:hasPermission>
 </form>
 </body>
 <script type="text/javascript">

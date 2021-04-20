@@ -60,5 +60,13 @@ public class UserVOReq {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginTime;
 
+    /**
+     * 角色id
+     */
     private Integer roleId;
+
+    /**
+     * 加密用的盐
+     */
+    private String salt;
 }

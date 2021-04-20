@@ -6,7 +6,9 @@ import com.dj.mall.admin.vo.auth.resource.ResourceVOResp;
 import com.dj.mall.auth.api.resource.ResourceService;
 import com.dj.mall.auth.dto.ResourceDTO;
 import com.dj.mall.common.base.ResultModel;
+import com.dj.mall.common.constant.ResourceConstant;
 import com.dj.mall.common.util.DozerUtil;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,9 +26,9 @@ public class ResourceController {
 
     /**
      * 展示
-     *
      * @return
      */
+    @RequiresPermissions(ResourceConstant.RESOURCE_MANAGER)
     @RequestMapping("show")
     public ResultModel show() throws Exception {
         List<ResourceDTO> resourceDTOList = resourceService.findResource();
@@ -35,10 +37,10 @@ public class ResourceController {
 
     /**
      * 新增资源
-     *
      * @param resourceVOReq
      * @return
      */
+    @RequiresPermissions(ResourceConstant.RESOURCE_ADD_BTN)
     @RequestMapping("add")
     public ResultModel add(ResourceVOReq resourceVOReq) throws Exception {
         Assert.hasText(resourceVOReq.getResourceName(), "资源名称不能为空");
@@ -51,11 +53,11 @@ public class ResourceController {
 
     /**
      * 修改资源
-     *
      * @param resourceVOReq
      * @return
      * @throws Exception
      */
+    @RequiresPermissions(ResourceConstant.RESOURCE_UPDATE_BTN)
     @PostMapping("update")
     public ResultModel update(ResourceVOReq resourceVOReq) throws Exception {
         Assert.hasText(resourceVOReq.getResourceName(), "资源名称不能为空");
@@ -65,6 +67,4 @@ public class ResourceController {
         resourceService.updateResource(DozerUtil.map(resourceVOReq, ResourceDTO.class));
         return new ResultModel().success();
     }
-
-
 }

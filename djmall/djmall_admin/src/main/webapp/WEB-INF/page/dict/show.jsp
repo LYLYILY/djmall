@@ -1,12 +1,6 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ly
-  Date: 2021/4/7
-  Time: 14:56
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <html>
 <head>
     <meta charset="utf-8">
@@ -25,7 +19,9 @@
         </select><br>
 分类名称：<input type="text" name="dictName"><br>
 分类code:<input type='text' name="code"/><br>
-<input type='button' class='layui-btn layui-btn-normal layui-btn-sm' value="新增" onclick="add()"/>
+<shiro:hasPermission name="DICT_DATA_ADD_BTN">
+    <input type='button' class='layui-btn layui-btn-normal layui-btn-sm' value="新增" onclick="add()"/>
+</shiro:hasPermission>
     <table class="layui-table">
         <tr>
             <th>CODE</th>
@@ -63,7 +59,7 @@
                     html+="<td>"+list.code+"</td>";
                     html+="<td>"+list.dictName+"</td>";
                     html+="<td>"+list.parentCode+"</td>";
-                    html+="<td><input type='button' class='layui-btn layui-btn-normal layui-btn-sm' value='修改' onclick='upd(&quot;"+ list.code + "&quot;)'/>";
+                    html+="<td><shiro:hasPermission name="DICT_DATA_UPDATE_BTN"><input type='button' class='layui-btn layui-btn-normal layui-btn-sm' value='修改' onclick='upd(&quot;"+ list.code + "&quot;)'/></shiro:hasPermission>";
                     html+="</tr>";
                 }
                 $("#tb").html(html);

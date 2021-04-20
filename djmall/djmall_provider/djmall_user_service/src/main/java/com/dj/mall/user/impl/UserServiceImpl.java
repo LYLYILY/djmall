@@ -5,9 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dj.mall.auth.dto.ResourceDTO;
-import com.dj.mall.auth.dto.RoleDTO;
-import com.dj.mall.auth.mapper.bo.ResourceBO;
 import com.dj.mall.user.dto.MenuDTO;
 import com.dj.mall.user.entity.UserRoleEntity;
 import com.dj.mall.common.base.BusinessException;
@@ -30,8 +27,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private UserRoleService userRoleService;
 
+    /**
+     * 登录
+     * @param userDTO
+     * @return
+     * @throws Exception
+     */
     @Override
-    public UserDTO findByUserNameAndUserPwd(UserDTO userDTO) throws Exception {
+    public UserDTO findByUserNameAndUserPwd(UserDTO userDTO) throws BusinessException, Exception {
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_name", userDTO.getQueryName())
                 .or().eq("user_phone", userDTO.getQueryName())
@@ -47,13 +50,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (!userEntity.getUserPwd().equals(userDTO.getUserPwd())) {
             throw new BusinessException("密码输入错误");
         }
+        if (!userEntity.getUserStatus().equals("NORMAL")) {
+            throw new BusinessException("该账户已被锁定.请联系管理员激活");
+        }
         UserDTO userDTO1 = DozerUtil.map(userEntity, UserDTO.class);
-        userDTO1.setResourceList(this.getLeft(userEntity.getId()));
+        /*userDTO1.setResourceList(this.getLeft(userEntity.getId()));*/
+        QueryWrapper<UserRoleEntity> queryWrapper1 = new QueryWrapper();
+        queryWrapper1.eq("user_id", userDTO1.getId());
+        UserRoleEntity roleIds = userRoleService.getOne(queryWrapper1);
+        userDTO1.setRoleId(roleIds.getRoleId());
         return userDTO1;
     }
 
+    /**
+     * 注册
+     * @param userDTO
+     * @throws Exception
+     */
     @Override
     public void add(UserDTO userDTO) throws Exception {
+        if (!userDTO.getUserRank().equals("1")) {
+            userDTO.setUserStatus("NONACTIVATE");
+        }
         userDTO.setCreateTime(LocalDateTime.now());
         UserEntity userEntity = DozerUtil.map(userDTO, UserEntity.class);
         super.save(userEntity);
@@ -63,6 +81,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userRoleService.save(userRoleEntity);
     }
 
+    /**
+     * 用户注册-用户名查重
+     * @param userName
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean findUserName(String userName) throws Exception {
         QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
@@ -74,6 +98,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+    /**
+     * 用户注册-邮箱查重
+     * @param userEmail
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean findUserEmail(String userEmail) throws Exception {
         QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
@@ -85,6 +115,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+    /**
+     * 用户注册-手机号查重
+     * @param userPhone
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean findUserPhone(String userPhone) throws Exception {
         QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
@@ -96,12 +132,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+    /**
+     * 用户管理展示
+     * @param userDTO
+     * @return
+     * @throws Exception
+     */
     @Override
     public List<UserDTO> findUserAll(UserDTO userDTO) throws Exception {
         List<UserBO> userBOList = super.baseMapper.findUserAll(DozerUtil.map(userDTO, UserBO.class));
         return DozerUtil.mapList(userBOList, UserDTO.class);
     }
 
+    /**
+     * 用户授权
+     * @param userDTO
+     * @throws Exception
+     */
     @Override
     public void insertUserRole(UserDTO userDTO) throws Exception {
         QueryWrapper<UserRoleEntity> queryWrapper = new QueryWrapper();
@@ -122,6 +169,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         /*}*/
     }
 
+    /**
+     * 根据用户id查找角色
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @Override
     public Integer findRoleByUserId(Integer id) {
         QueryWrapper queryWrapper = new QueryWrapper();
@@ -130,12 +183,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return one.getRoleId();
     }
 
+    /**
+     * 修改用户名查重
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     @Override
     public UserDTO findUserByUserId(Integer userId) {
         UserEntity userEntity = super.getById(userId);
         return DozerUtil.map(userEntity, UserDTO.class);
     }
 
+    /**
+     * 用户修改
+     * @param userDTO
+     * @throws Exception
+     */
     @Override
     public void updateUserById(UserDTO userDTO) {
         super.updateById(DozerUtil.map(userDTO, UserEntity.class));
@@ -192,9 +256,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return true;
     }
 
+    /**
+     * 获取左侧菜单
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @Override
     public List<MenuDTO> getLeft(Integer id) throws Exception {
         List<MenuBO> resourceBOS = baseMapper.getLeft(id);
         return DozerUtil.mapList(resourceBOS, MenuDTO.class);
+    }
+
+    /**
+     * 获取盐
+     * @param queryName
+     * @return
+     * @throws BusinessException
+     */
+    @Override
+    public String findSaltByQueryName(String queryName) throws BusinessException {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("user_name", queryName)
+                .or().eq("user_phone", queryName)
+                .or().eq("user_email", queryName);
+        UserEntity salt = super.getOne(queryWrapper);
+        if (salt == null) {
+            throw new BusinessException("此用户不存在");
+        }
+        return salt.getSalt();
+    }
+
+    /**
+     * 激活用户
+     *
+     * @param userDTO
+     * @throws Exception
+     */
+    @Override
+    public void updateUserStatusById(UserDTO userDTO) throws Exception {
+        QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", userDTO.getId());
+        UserEntity userEntity = super.getOne(wrapper);
+        userEntity.setUserStatus("NORMAL");
+        super.saveOrUpdate(userEntity);
     }
 }

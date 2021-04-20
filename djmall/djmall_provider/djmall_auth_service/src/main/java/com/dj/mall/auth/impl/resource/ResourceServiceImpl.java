@@ -19,9 +19,9 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourceEnt
 
     @Reference
     private ResourceService resourceService;
+
     /**
      * 展示资源
-     *
      * @return
      * @throws Exception
      */
@@ -33,7 +33,6 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourceEnt
 
     /**
      * 根据id查资源名称
-     *
      * @param id 资源id
      * @return
      * @throws Exception
@@ -46,7 +45,6 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourceEnt
 
     /**
      * 新增资源
-     *
      * @param resourceDTO
      * @throws Exception
      */
@@ -65,7 +63,6 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourceEnt
 
     /**
      * 修改资源
-     *
      * @param resourceDTO
      * @throws Exception
      */
@@ -80,6 +77,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, ResourceEnt
         super.updateById(DozerUtil.map(resourceDTO, ResourceEntity.class));
     }
 
-
-
+    @Override
+    public List<ResourceDTO> findResourceById(List<Integer> addRedis) throws Exception {
+        return DozerUtil.mapList((List<?>) super.listByIds(addRedis), ResourceDTO.class);
+    }
 }

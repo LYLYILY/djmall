@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -61,7 +63,9 @@
     </script>
 </head>
 <body>
+<shiro:hasPermission name="ROLE_RESOURCE_BTN">
 <input type="button" value="保存" onclick="update()">
+</shiro:hasPermission>
 <div id="roleResource" class="ztree"></div>
 </body>
 </html>

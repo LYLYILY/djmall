@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,18 +24,32 @@
     <c:forEach var="s" items="${sexList}">
         <input type="radio" name="userSex" value="${s.code}">${s.dictName}
     </c:forEach><br>
+
     状态：<select name="userStatus">
     <option value="">请选择</option>
     <c:forEach var="u" items="${statusList}">
         <option value="${u.code}">${u.dictName}</option>
     </c:forEach>
 </select><br>
+    <shiro:hasPermission name="USER_QUERY_BTN">
         <input type="button" class="layui-btn layui-btn-normal layui-btn-sm" value="查询" onclick="query()"><br>
+    </shiro:hasPermission>
+    <shiro:hasPermission name="USER_UPDATE_BTN">
         <br><input type="button"  class="layui-btn layui-btn-normal layui-btn-sm" value="修改" onclick="upd()">&nbsp&nbsp
+    </shiro:hasPermission>
+    <shiro:hasPermission name="USER_ACTIVE_BTN">
         <input type="button" class="layui-btn layui-btn-normal layui-btn-sm" value="激活" onclick="att()">&nbsp&nbsp
+    </shiro:hasPermission>
+    <shiro:hasPermission name="USER_RESET_PWD_BTN">
         <input type="button" class="layui-btn layui-btn-normal layui-btn-sm" value="重置密码" onclick="newPwd()">&nbsp&nbsp
+    </shiro:hasPermission>
+    <shiro:hasPermission name="USER_DEL_BTN">
         <input type="button" class="layui-btn layui-btn-normal layui-btn-sm" value="删除" onclick="del()">&nbsp&nbsp
+    </shiro:hasPermission>
+    <shiro:hasPermission name="USER_PERMISSION_BTN">
         <input type="button" class="layui-btn layui-btn-normal layui-btn-sm" value="授权" onclick="uth()">
+    </shiro:hasPermission>
+
     <table  class="layui-table">
         <tr>
             <th>用户id</th>
@@ -144,6 +159,44 @@
             area: ['500px', '400px'],
             content: ['<%=request.getContextPath()%>/user/toUpd/'+ ids[0], 'no']
         });
+    }
+
+    function att(){
+        var userId = $('input[name="id_check"]:checked').val();
+        var ids=[];
+        $("input[name='id_check']:checked").each(function(){
+            ids.push(userId);
+        })
+        if(ids.length>1){
+            layer.msg("只能勾选一项");
+            return;
+        }
+        if(ids.length<1){
+            layer.msg("至少勾选一项");
+            return;
+        }
+        var statusOld = $("#" + ids[0]).val();
+        var statusNew = statusOld == "NORMAL" ? "NONACTIVATE" : "NORMAL";
+        var statusMsg = statusOld == "NORMAL" ? "未激活" : "正常";
+        layer.confirm(
+            '您确定要将该用户置为'+statusMsg+'?',
+            {icon: 3,
+                title:'提示',
+                btn:['确定','再考虑一下']},
+            function(){
+                $.post(
+                    "<%=request.getContextPath()%>/user/updateStatus",
+                    {"id":ids[0], "userStatus":statusNew},
+                    function(result){
+                        if (result.code == 200){
+                            location.href="<%=request.getContextPath()%>/user/toShow"
+                            return;
+                        }
+                        layer.msg("操作失败");
+                    }
+                );
+            });
+
     }
 
 </script>

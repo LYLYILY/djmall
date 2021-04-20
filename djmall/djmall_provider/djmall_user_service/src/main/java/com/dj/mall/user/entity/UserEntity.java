@@ -28,13 +28,12 @@ public class UserEntity {
 
     private String userStatus;
 
-    /**
-     * 注册时间
-     */
     private LocalDateTime createTime;
 
-    /**
-     * 最终登陆时间
-     */
     private LocalDateTime lastLoginTime;
+
+    /**
+     * 加密用的盐
+     */
+    private String salt;
 }

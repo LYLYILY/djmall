@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-	           <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -9,6 +9,7 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/static/jq/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/static/validate/jquery.validate.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/static/layer/layer.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/static/jq/md5-min.js"></script>
     <title>Insert title here</title>
 <script type="text/javascript">
     $(function() {
@@ -112,6 +113,8 @@
             },
             submitHandler:function(fm){
                 var index = layer.load();
+                $("#userPwd").val(md5(md5($("#userPwd").val())+$("#salt").val()));
+                $("#confirmPassword").val(md5(md5($("#confirmPassword").val())+$("#salt").val()));
                 $.post("<%=request.getContextPath()%>/user/add",
                     $("#fm").serialize(),
                     function(data){
@@ -152,8 +155,8 @@
 </head>
 <body>
 <form id="fm">
-    <%--<input name="userStatus" type="hidden" value="NORMAL">--%>
-        <input name="userStatus" type="hidden" value="NORMAL">
+    <input name="userStatus" type="hidden" value="NORMAL">
+    <input name="salt" id="salt" type="hidden" value="${salt}">
     <table>
         <tr>
             <td><label for="userName">用户名</label></td>
@@ -192,11 +195,10 @@
             <td>级别:</td>
             <td>
                 <c:forEach var="r" items="${roleVOResps}">
-                    ${r.roleName}<input type="radio" name="userRank"  value="${r.id}" />
+                    ${r.roleName}<input type="radio" name="userRank" value="${r.id}"/>
                 </c:forEach><br>
             </td>
         <tr>
-
             </td>
         </tr>
         <tr>
