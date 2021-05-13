@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.dict.mapper.sku.SkuMapper">
+    <select id="findSkuAll" resultType="com.dj.mall.dict.mapper.bo.sku.SkuBO">
+        SELECT
+            gm.id,
+            dict.`code` AS product_type,
+            dict.dict_name AS productName,
+            GROUP_CONCAT(attr.attr_name) AS attrName
+        FROM
+            djmall_dict dict
+                LEFT JOIN djmall_dict_product_sku_gm gm ON dict.`code` = gm.product_type
+                LEFT JOIN djmall_dict_product_attr attr ON gm.attr_id = attr.id
+        WHERE
+            dict.parent_code = 'PRODUCT_TYPE'
+        GROUP BY
+            gm.product_type
+        ORDER BY gm.id ASC
+    </select>
+    <select id="showRelevance" resultType="com.dj.mall.dict.mapper.bo.sku.SkuBO">
+        SELECT
+            attr.id,
+            attr.attr_name,
+            GROUP_CONCAT(attrv.attr_value) AS attrValue
+        FROM
+            djmall_dict_product_attr attr
+                LEFT JOIN djmall_dict_product_attr_value attrv ON attr.id = attrv.attr_id
+        GROUP BY
+            attr.id
+    </select>
+    <select id="findAttrValueByProductType" resultType="com.dj.mall.dict.mapper.bo.attr.AttrValueBO">
+        SELECT
+            pa.id, pa.attr_name, GROUP_CONCAT(pav.attr_value) AS attr_value,
+            GROUP_CONCAT(pav.id) AS attr_ids
+        FROM
+            djmall_dict_product_sku_gm psg
+                LEFT JOIN djmall_dict_product_attr pa ON psg.attr_id = pa.id
+                LEFT JOIN djmall_dict_product_attr_value pav ON pa.id = pav.attr_id
+        WHERE
+            psg.product_type = #{productType}
+        GROUP BY
+            pa.attr_name
+    </select>
+</mapper>

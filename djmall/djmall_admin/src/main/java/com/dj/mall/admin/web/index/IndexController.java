@@ -3,25 +3,21 @@ package com.dj.mall.admin.web.index;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.dj.mall.admin.vo.auth.resource.ResourceVOResp;
-import com.dj.mall.auth.api.resource.ResourceService;
-import com.dj.mall.auth.dto.ResourceDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
 import com.dj.mall.common.base.ResultModel;
 import com.dj.mall.common.constant.CacheKeyConsant;
 import com.dj.mall.common.constant.UserConstant;
 import com.dj.mall.common.util.DozerUtil;
 import com.dj.mall.user.api.UserService;
-import com.dj.mall.user.dto.MenuDTO;
 import com.dj.mall.user.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

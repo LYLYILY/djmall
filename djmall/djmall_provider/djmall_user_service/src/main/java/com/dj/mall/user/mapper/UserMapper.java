@@ -1,7 +1,6 @@
 package com.dj.mall.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.dj.mall.auth.mapper.bo.ResourceBO;
 import com.dj.mall.user.entity.UserEntity;
 import com.dj.mall.user.mapper.bo.MenuBO;
 import com.dj.mall.user.mapper.bo.UserBO;

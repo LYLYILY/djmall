@@ -1,8 +1,7 @@
 package com.dj.mall.admin.config;
 
-import com.dj.mall.auth.dto.ResourceDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
 import com.dj.mall.common.constant.UserConstant;
-import com.dj.mall.user.dto.MenuDTO;
 import com.dj.mall.user.dto.UserDTO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;

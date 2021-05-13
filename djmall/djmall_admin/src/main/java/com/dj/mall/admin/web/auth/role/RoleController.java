@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.dj.mall.admin.vo.auth.role.RoleVOReq;
 import com.dj.mall.admin.vo.auth.role.RoleVOResp;
 import com.dj.mall.auth.api.role.RoleAuthService;
-import com.dj.mall.auth.dto.RoleDTO;
+import com.dj.mall.auth.dto.role.RoleDTO;
 import com.dj.mall.auth.dto.TreeDataDTO;
 import com.dj.mall.common.base.ResultModel;
 import com.dj.mall.common.constant.RoleConstant;

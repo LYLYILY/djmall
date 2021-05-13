@@ -2,8 +2,8 @@ package com.dj.mall.auth.api.role;
 
 
 
-import com.dj.mall.auth.dto.ResourceDTO;
-import com.dj.mall.auth.dto.RoleDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
+import com.dj.mall.auth.dto.role.RoleDTO;
 import com.dj.mall.auth.dto.TreeDataDTO;
 
 import java.util.List;

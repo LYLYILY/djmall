@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.product.mapper.product.ProductMapper">
+    <select id="findProductAll" resultType="com.dj.mall.product.mapper.bo.ProductBO">
+        SELECT
+        p.*, d.dict_name AS product_type_show,
+        d2.dict_name AS product_status_show,
+        pf.freight,
+        pf.logistics_company
+        FROM
+        djmall_product p
+        LEFT JOIN djmall_dict d ON p.product_type = d.`code`
+        LEFT JOIN djmall_dict d2 ON p.product_status = d2.`code`
+        LEFT JOIN djmall_dict_product_freight  pf ON p.freight_id = pf.id
+        LEFT JOIN djmall_product_sku dps ON p.id = dps.product_id
+        <where>
+            <if test="null != product.productName and '' != product.productName">
+                p.product_name like "%"#{product.productName}"%"
+            </if>
+            <if test="null != product.productTypeList">
+                and p.product_type in
+                <foreach collection="product.productTypeList" item="pp" open="(" close=")" separator=",">
+                    #{pp}
+                </foreach>
+            </if>
+            <if test="product.roleId == 2">
+                and dps.business_id = #{product.businessId}
+            </if>
+        </where>
+            group by p.id
+    </select>
+    <select id="findProductEs" resultType="com.dj.mall.product.mapper.bo.ProductBO">
+        SELECT
+            dp.id,
+            dp.product_name,
+            dps.sku_price AS skuPrice,
+            dps.sku_count AS skuCount,
+            dp.product_type,
+            dd.dict_name AS productTypeShow,
+            dps.sku_rate AS skuRate,
+            df.freight AS freight,
+            dp.product_img,
+            CASE
+                WHEN dps.is_default = 'DEFAULT' THEN
+                    (CONCAT(dp.product_name, ',', dps.sku_name, ',', dp.product_disc)) ELSE (CONCAT(dp.product_name, ',', dps.sku_name, ',', dp.product_disc))
+                END AS productDisc,
+            dp.like_num,
+            CONCAT(dp.product_name, ',', GROUP_CONCAT(dps.sku_name), ',', dp.product_disc) AS keywords
+        FROM
+            djmall_product dp
+                LEFT JOIN djmall_product_sku dps ON dps.product_id = dp.id
+                LEFT JOIN djmall_dict dd ON dd.`code` = dp.product_type
+                LEFT JOIN djmall_dict_product_freight df ON df.id = dp.freight_id
+        WHERE dp.id = #{id}
+        GROUP BY dp.id
+    </select>
+</mapper>

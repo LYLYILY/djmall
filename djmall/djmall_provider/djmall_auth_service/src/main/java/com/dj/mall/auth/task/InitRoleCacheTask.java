@@ -1,8 +1,8 @@
 package com.dj.mall.auth.task;
 
 import com.dj.mall.auth.api.role.RoleAuthService;
-import com.dj.mall.auth.dto.ResourceDTO;
-import com.dj.mall.auth.dto.RoleDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
+import com.dj.mall.auth.dto.role.RoleDTO;
 import com.dj.mall.common.constant.CacheKeyConsant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

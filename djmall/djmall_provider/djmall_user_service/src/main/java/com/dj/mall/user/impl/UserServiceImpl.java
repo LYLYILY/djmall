@@ -1,11 +1,17 @@
 package com.dj.mall.user.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dj.mall.cmpt.api.EMailApi;
+import com.dj.mall.common.constant.CacheKeyConsant;
+import com.dj.mall.common.util.PasswordSecurityUtil;
 import com.dj.mall.user.dto.MenuDTO;
+import com.dj.mall.user.dto.UserTokenDTO;
 import com.dj.mall.user.entity.UserRoleEntity;
 import com.dj.mall.common.base.BusinessException;
 import com.dj.mall.common.util.DozerUtil;
@@ -16,16 +22,27 @@ import com.dj.mall.user.mapper.UserMapper;
 import com.dj.mall.user.mapper.bo.MenuBO;
 import com.dj.mall.user.mapper.bo.UserBO;
 import com.dj.mall.user.service.user.UserRoleService;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 登录
@@ -44,6 +61,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         updateWrapper.set("last_login_time", LocalDateTime.now());
         updateWrapper.eq("id", userEntity.getId());
         super.update(updateWrapper);
+        if (userEntity.getUserStatus().equals("CHONGZHI")) {
+            throw new BusinessException(-4, "该账户已被重置");
+        }
         if (userEntity == null) {
             throw new BusinessException("用户名输入错误");
         }
@@ -79,6 +99,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userRoleEntity.setUserId(userEntity.getId());
         userRoleEntity.setRoleId(Integer.parseInt(userDTO.getUserRank()));
         userRoleService.save(userRoleEntity);
+
+        if (userDTO.getUserStatus().equals("NONACTIVATE")) {
+            JSONObject message = new JSONObject();
+            message.put("email", userDTO.getUserEmail());
+            message.put("userName", userEntity.getUserName());
+            message.put("userId", userEntity.getId());
+            rabbitTemplate.convertAndSend("direct", "directQueue1", message.toJSONString());
+        }
     }
 
     /**
@@ -294,11 +322,196 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @throws Exception
      */
     @Override
-    public void updateUserStatusById(UserDTO userDTO) throws Exception {
+    public void updateUserStatusById(UserDTO userDTO) throws BusinessException {
         QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("id", userDTO.getId());
         UserEntity userEntity = super.getOne(wrapper);
+        if (userEntity.getUserStatus().equals("NORMAL")) {
+            throw new BusinessException("已是激活状态");
+        }
         userEntity.setUserStatus("NORMAL");
         super.saveOrUpdate(userEntity);
+    }
+
+    /**
+     * 商城用户登录
+     *
+     * @param queryName
+     * @param userPwd
+     * @return
+     */
+    @Override
+    public UserTokenDTO findByUserNameAndUserPwdToken(String queryName, String userPwd) throws Exception {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("user_name", queryName)
+                .or().eq("user_phone", queryName)
+                .or().eq("user_email", queryName);
+        UserEntity userEntity = super.baseMapper.selectOne(queryWrapper);
+        if (userEntity == null) {
+            throw new BusinessException("用户名输入错误");
+        }
+        if (!userPwd.equals(userEntity.getUserPwd())) {
+            throw new BusinessException("密码输入错误");
+        }
+        String token = UUID.randomUUID().toString().replace("-", "");
+        redisTemplate.opsForValue().set(CacheKeyConsant.USER_TOKEN + token, DozerUtil.map(userEntity, UserDTO.class), 22 * 24 * 60 * 60);
+        UserTokenDTO userTokenDTO = new UserTokenDTO();
+        userTokenDTO.setToken(token);
+        userTokenDTO.setNickName(userEntity.getNikeName());
+        userTokenDTO.setQueryName(queryName);
+        userTokenDTO.setUserId(userEntity.getId());
+        return userTokenDTO;
+    }
+
+    /**
+     * 邮箱激活
+     *
+     * @param userId
+     * @throws Exception
+     */
+    @Override
+    public void updateUserStatus1(Integer userId) throws Exception {
+        UpdateWrapper<UserEntity> queryWrapper = new UpdateWrapper<>();
+        queryWrapper.eq("id", userId);
+        queryWrapper.set("user_status", "NORMAL");
+        super.update(queryWrapper);
+    }
+
+    /**
+     * 重置随机六位密码-发邮件
+     *
+     * @param id
+     * @throws Exception
+     */
+    @Override
+    public void updatePwdById(Integer id) throws Exception {
+        UserEntity userEntity = super.getById(id);
+        String newPwd = PasswordSecurityUtil.generateRandom(6);
+        String newSalt = PasswordSecurityUtil.generateSalt();
+        String overPwd = PasswordSecurityUtil.enCode32(PasswordSecurityUtil.enCode32(newPwd) + newSalt);
+
+        UpdateWrapper<UserEntity> queryWrapper = new UpdateWrapper<>();
+        queryWrapper.eq("id", id);
+        queryWrapper.set("user_status", "CHONGZHI");
+        queryWrapper.set("user_pwd", overPwd);
+        super.update(queryWrapper);
+        JSONObject message = new JSONObject();
+        message.put("email", userEntity.getUserEmail());
+        message.put("userPwd", newPwd);
+        rabbitTemplate.convertAndSend("direct", "directQueue2", message.toJSONString());
+
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param userDTO
+     */
+    @Override
+    public void restUserPwd(UserDTO userDTO) throws Exception {
+        UpdateWrapper<UserEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("user_name", userDTO.getQueryName())
+                .or().eq("user_phone", userDTO.getUserPhone())
+                .or().eq("user_email", userDTO.getUserEmail())
+                .set("user_status", "NORMAL")
+                .set("salt", userDTO.getSalt())
+                .set("user_pwd", userDTO.getUserPwd());
+        super.update(updateWrapper);
+    }
+
+    /**
+     * 根据手机号修改密码
+     * @param userDTO
+     * @throws Exception
+     */
+    @Override
+    public void updatePwdByPhone(UserDTO userDTO) throws Exception {
+        UpdateWrapper<UserEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("user_phone", userDTO.getUserPhone());
+        updateWrapper.set("user_pwd", userDTO.getUserPwd()).set("salt", userDTO.getSalt());
+        super.update(updateWrapper);
+    }
+
+    /**
+     * 手机号登录
+     *
+     * @param userPhone
+     * @throws Exception
+     */
+    @Override
+    public UserTokenDTO phoneLogin(String userPhone) throws Exception {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_phone", userPhone);
+        UserEntity userEntity = super.baseMapper.selectOne(queryWrapper);
+        UpdateWrapper<UserEntity> updateWrapper = new UpdateWrapper();
+        updateWrapper.set("last_login_time", LocalDateTime.now());
+        updateWrapper.eq("id", userEntity.getId());
+        super.update(updateWrapper);
+        if (userEntity.getUserStatus().equals("CHONGZHI")) {
+            throw new BusinessException(-4, "该账户已被重置");
+        }
+        if (userEntity == null) {
+            throw new BusinessException("用户名输入错误");
+        }
+        if (!userEntity.getUserStatus().equals("NORMAL")) {
+            throw new BusinessException("该账户已被锁定.请联系管理员激活");
+        }
+        String token = UUID.randomUUID().toString().replace("-", "");
+        redisTemplate.opsForValue().set(CacheKeyConsant.USER_TOKEN + token, DozerUtil.map(userEntity, UserDTO.class), 22 * 24 * 60 * 60);
+        UserTokenDTO userTokenDTO = new UserTokenDTO();
+        userTokenDTO.setToken(token);
+        userTokenDTO.setNickName(userEntity.getNikeName());
+        userTokenDTO.setUserId(userEntity.getId());
+        return userTokenDTO;
+    }
+
+    /**
+     * 商城用户注册
+     *
+     * @param userDTO
+     * @throws Exception
+     */
+    @Override
+    public void addRegister(UserDTO userDTO) throws Exception {
+        userDTO.setCreateTime(LocalDateTime.now());
+        if("".equals(userDTO.getNikeName())){
+            userDTO.setNikeName("DJ"+PasswordSecurityUtil.generateRandom(6));
+        }
+        UserEntity userEntity = DozerUtil.map(userDTO, UserEntity.class);
+        super.save(userEntity);
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        userRoleEntity.setUserId(userEntity.getId());
+        userRoleEntity.setRoleId(Integer.parseInt(userDTO.getUserRank()));
+        userRoleService.save(userRoleEntity);
+    }
+
+    /**
+     * 用户修改-昵称是否与用户名重复
+     *
+     * @param nikeName
+     * @param userId
+     * @return
+     */
+    @Override
+    public boolean findUserNikeName(String nikeName, Integer userId) throws Exception {
+        QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("nike_name", nikeName);
+        UserEntity nikeName1 = super.getOne(wrapper);
+        UserEntity userName = super.getById(userId);
+        if (!userName.equals(nikeName1)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 个人中心修改
+     *
+     * @param userDTO
+     * @throws Exception
+     */
+    @Override
+    public void update(UserDTO userDTO) throws Exception {
+        super.updateById(DozerUtil.map(userDTO, UserEntity.class));
     }
 }

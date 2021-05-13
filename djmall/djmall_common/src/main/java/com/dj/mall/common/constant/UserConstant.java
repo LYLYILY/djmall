@@ -17,4 +17,10 @@ public interface UserConstant {
     String USER_PERMISSION_BTN = "USER_PERMISSION_BTN";
 
     String USER_RESET_PWD_BTN = "USER_RESET_PWD_BTN";
+
+    String SESSION_VERIFY_CODE = "SESSION_VERIFY_CODE";
+
+    String SMS_FORGRTPWD_PRE = "SMS_FORGRTPWD_PRE";
+
+    String PHONE_SMS = "PHONE_SMS";
 }

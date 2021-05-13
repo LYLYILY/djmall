@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dj.mall.dict.mapper.AttrMapper">
-    <select id="findAttrAll" resultType="com.dj.mall.dict.mapper.bo.AttrBO">
+<mapper namespace="com.dj.mall.dict.mapper.attr.AttrMapper">
+    <select id="findAttrAll" resultType="com.dj.mall.dict.mapper.bo.attr.AttrBO">
         SELECT
             ddpa.id,
             ddpa.attr_name,

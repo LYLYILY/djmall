@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.product.mapper.shop.ShopCarMapper">
+    <select id="show" resultType="com.dj.mall.product.mapper.bo.ShopCarBO">
+        SELECT
+            usc.id,
+            usc.user_id,
+            usc.sku_id,
+            p.product_name,
+            pk.sku_name,
+            pk.sku_price,
+            pf.freight,
+            usc.buy_num,
+            pk.sku_rate
+        FROM
+            djmall_user_shop_car usc
+                LEFT JOIN djmall_product_sku pk ON usc.sku_id = pk.id
+                LEFT JOIN djmall_product p ON pk.product_id = p.id
+                LEFT JOIN djmall_dict_product_freight pf ON p.freight_id = pf.id
+        WHERE
+            usc.user_id = #{userId}
+          AND usc.buy_status = #{buyStatus}
+    </select>
+    <select id="findShopByIds" resultType="com.dj.mall.product.mapper.bo.ShopCarBO">
+        SELECT
+        usc.id,
+        usc.user_id,
+        usc.sku_id,
+        p.product_name,
+        pk.sku_name,
+        pk.sku_price,
+        pf.freight,
+        usc.buy_num,
+        pk.sku_rate
+        FROM
+        djmall_user_shop_car usc
+        LEFT JOIN djmall_product_sku pk ON usc.sku_id = pk.id
+        LEFT JOIN djmall_product p ON pk.product_id = p.id
+        LEFT JOIN djmall_dict_product_freight pf ON p.freight_id = pf.id
+        <where>
+         usc.id IN
+        <foreach collection = "list" item = "list1" open = "(" close = ")" separator = "," >#{list1}</foreach>
+        </where>
+    </select>
+</mapper>

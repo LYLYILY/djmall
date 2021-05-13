@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.product.mapper.order.OrderInfoMapper">
+
+    <select id="findOrderInfoAll" resultType="com.dj.mall.product.mapper.bo.OrderInfoBO">
+        SELECT
+            doi.*, dt.dict_name AS payTypeShow,
+            ddt.dict_name AS orderStatusShow,
+            dod.sku_rate,
+            CONCAT(dp.product_name,dod.sku_info) AS productName
+        FROM
+            djmall_order_info doi
+                LEFT JOIN djmall_dict dt ON doi.pay_type = dt.`code`
+                LEFT JOIN djmall_dict ddt ON doi.order_status = ddt.`code`
+                LEFT JOIN djmall_order_detail dod ON doi.order_no = dod.child_order_no
+                LEFT JOIN djmall_product dp ON dod.product_id = dp.id
+                LEFT JOIN djmall_product_sku dps ON dod.sku_id
+        WHERE
+            doi.buyer_id = #{userId}
+          AND doi.order_status = #{orderStatus}
+        GROUP BY doi.order_no
+    </select>
+
+    <select id="showDetails" resultType="com.dj.mall.product.mapper.bo.OrderInfoBO">
+        SELECT
+            dor.order_no,
+            dor.receiver_name,
+            dor.receiver_phone,
+            dor.receiver_province,
+            dor.receiver_city,
+            dor.receiver_county,
+            dor.receiver_detail,
+            dor.create_time,
+            dor.pay_time,
+            dd.dict_name as payTypeShow,
+            dor.total_money,
+            dor.total_freight,
+            dor.total_pay_money
+        FROM
+            djmall_order_info dor
+                LEFT JOIN djmall_dict dd ON dor.pay_type = dd.`code`
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <update id="updateStatus">
+        update djmall_order_info set order_status = #{status} where update_time &lt; #{time} and order_status = 'ORDER_WAIT_RECE'
+    </update>
+</mapper>

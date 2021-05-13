@@ -23,9 +23,17 @@
 				if(data.code =='200'){
 					layer.msg(data.msg);
 					location.href="<%=request.getContextPath()%>/index/toIndex";
-					return;
+
+				}else {
+					layer.open({
+						type: 2,
+						title: '修改密码',
+						shadeClose: false,
+						shade: 0.5,
+						area: ['300px', '400px'],
+						content:"<%=request.getContextPath()%>/user/toRestPwd/" + $("#queryName").val()
+					});
 				}
-				layer.msg(data.msg);
 			}
 		);
 	}
@@ -52,6 +60,17 @@
 					}
 			)
 		}
+	}
+
+	function pwd(){
+		layer.open({
+			type: 2,
+			title: '忘记密码',
+			shadeClose: false,
+			shade: 0.5,
+			area: ['300px', '400px'],
+			content:"<%=request.getContextPath()%>/user/toForGetPwd"
+		});
 	}
 
 	//判断当前窗口路径与加载路径是否一致。

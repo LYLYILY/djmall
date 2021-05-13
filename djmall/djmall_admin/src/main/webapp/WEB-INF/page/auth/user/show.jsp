@@ -9,11 +9,13 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/static/layer/layui.css"  media="all">
     <script type="text/javascript" src="<%=request.getContextPath()%>/static/jq/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/static/layer/layer.js"></script>
+    <script type="text/javascript" src="<%=request.getContextPath()%>/static/jq/md5-min.js"></script>
     <title>展示</title>
 </head>
 
 <body >
 <form id="fm">
+    <input name="salt" id="salt" type="hidden" value="${salt}">
     模糊匹配：<input type="text" placeholder="用户名/手机号/邮箱" name="queryNameOrPhoneOrEmail" ><br>
     级别：
     <c:forEach var="r" items="${role}">
@@ -184,7 +186,7 @@
                 title:'提示',
                 btn:['确定','再考虑一下']},
             function(){
-                $.post(
+                $.get(
                     "<%=request.getContextPath()%>/user/updateStatus",
                     {"id":ids[0], "userStatus":statusNew},
                     function(result){
@@ -196,7 +198,35 @@
                     }
                 );
             });
+    }
 
+    /**重置密码*/
+    function newPwd() {
+        var userId = $('input[name="id_check"]:checked').val();
+        var ids=[];
+        $("input[name='id_check']:checked").each(function(){
+            ids.push(userId);
+        })
+        if(ids.length>1){
+            layer.msg("只能勾选一项");
+            return;
+        }
+        if(ids.length<1){
+            layer.msg("请选择您要重置的用户");
+            return;
+        }
+
+        $.post(
+            "<%=request.getContextPath()%>/user/newPwd",
+            {
+                "id": ids[0]
+            },
+            function (result){
+                if(result.code == 200) {
+                    layer.msg("重置成功,请去邮箱查看密码");
+                }
+            }
+        )
     }
 
 </script>

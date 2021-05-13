@@ -2,7 +2,7 @@ package com.dj.mall.admin.web.auth.resource;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.dj.mall.auth.api.resource.ResourceService;
-import com.dj.mall.auth.dto.ResourceDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
 import com.dj.mall.common.constant.ResourceConstant;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;

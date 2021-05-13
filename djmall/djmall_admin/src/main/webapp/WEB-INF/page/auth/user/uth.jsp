@@ -28,7 +28,7 @@
                 for(var i=0;i<result.data.length;i++){
                     var list=result.data[i];
                     html+="<tr>";
-                    if ( list.id  == ${roleId}){
+                    if (list.id  == ${roleId}){
                         html+="<td><input type='radio' id='role_id' name='id' value='"+list.id+"' checked>"+list.id+"</td>"
                     }else{
                         html+="<td><input type='radio' id='role_id' name='id' value='"+list.id+"' >"+list.id+"</td>"

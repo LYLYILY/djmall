@@ -11,7 +11,7 @@
         resource_type
     </sql>
 
-    <select id="findResource" resultType="com.dj.mall.auth.mapper.bo.ResourceBO">
+    <select id="findResource" resultType="com.dj.mall.auth.mapper.bo.resource.ResourceBO">
         select
         <include refid="RESOURCE"/>
         from

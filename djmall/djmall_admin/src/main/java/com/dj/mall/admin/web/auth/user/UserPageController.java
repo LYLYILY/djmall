@@ -2,15 +2,16 @@ package com.dj.mall.admin.web.auth.user;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.dj.mall.admin.vo.auth.role.RoleVOResp;
+import com.dj.mall.admin.vo.auth.user.UserVOReq;
 import com.dj.mall.admin.vo.auth.user.UserVOResp;
 import com.dj.mall.auth.api.role.RoleAuthService;
-import com.dj.mall.auth.dto.RoleDTO;
+import com.dj.mall.auth.dto.role.RoleDTO;
 import com.dj.mall.common.constant.DictConstant;
 import com.dj.mall.common.constant.UserConstant;
 import com.dj.mall.common.util.DozerUtil;
 import com.dj.mall.common.util.PasswordSecurityUtil;
-import com.dj.mall.dict.api.DictDataService;
-import com.dj.mall.dict.dto.DictDataDTO;
+import com.dj.mall.dict.api.data.DictDataService;
+import com.dj.mall.dict.dto.data.DictDataDTO;
 import com.dj.mall.user.api.UserService;
 import com.dj.mall.user.dto.UserDTO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -72,6 +73,8 @@ public class UserPageController {
     public String toShow(ModelMap map) throws Exception {
         List<RoleDTO> role = roleAuthService.findRoleAll();
         List<DictDataDTO> sexList = dictDataService.findDictDataSex(DictConstant.SEX);
+        List<DictDataDTO> statusList = dictDataService.findDictNameByParentCode("ACTIVE_STATUS");
+        map.put("statusList", statusList);
         map.put("sexList", sexList);
         map.put("role", role);
         return "/auth/user/show";
@@ -110,4 +113,42 @@ public class UserPageController {
         map.put("user", user);
         return "/auth/user/update";
     }
+
+    /**
+     * 邮件激活
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("updateStatus1/{userId}")
+    public String updateStatus1(@PathVariable Integer userId) throws Exception {
+        userService.updateUserStatus1(userId);
+        return "/auth/user/login";
+    }
+
+    /**
+     * 去重置密码
+     * @param queryName
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("toRestPwd/{queryName}")
+    public String toRestPwd(@PathVariable String queryName, ModelMap map) throws Exception {
+        map.put("queryName", queryName);
+        map.put("salt", PasswordSecurityUtil.generateSalt());
+        return "/auth/user/rest_pwd";
+    }
+
+    /**
+     * 去忘记密码页面
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("toForGetPwd")
+    public String toForGetPwd(ModelMap map) throws Exception {
+        map.put("salt", PasswordSecurityUtil.generateSalt());
+        return "/auth/user/forget_pwd";
+    }
+
 }

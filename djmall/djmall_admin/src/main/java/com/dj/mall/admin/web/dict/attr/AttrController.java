@@ -9,9 +9,9 @@ import com.dj.mall.common.base.BusinessException;
 import com.dj.mall.common.base.ResultModel;
 import com.dj.mall.common.constant.AttrConstant;
 import com.dj.mall.common.util.DozerUtil;
-import com.dj.mall.dict.api.AttrService;
-import com.dj.mall.dict.dto.AttrDTO;
-import com.dj.mall.dict.dto.AttrValueDTO;
+import com.dj.mall.dict.api.attr.AttrService;
+import com.dj.mall.dict.dto.attr.AttrDTO;
+import com.dj.mall.dict.dto.attr.AttrValueDTO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,6 +71,7 @@ public class AttrController {
      * @throws Exception
      */
     @RequestMapping("list/{id}")
+    @RequiresPermissions(AttrConstant.ATTR_VALUE_BTN)
     public ResultModel list(@PathVariable Integer id) throws Exception {
         List<AttrValueDTO> attrValueDTOList = attrService.findAttrValueById(id);
         return new ResultModel().success(DozerUtil.mapList(attrValueDTOList, AttrValueVOResp.class));

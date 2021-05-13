@@ -2,7 +2,7 @@ package com.dj.mall.admin.web.auth.role;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.dj.mall.auth.api.role.RoleAuthService;
-import com.dj.mall.auth.dto.RoleDTO;
+import com.dj.mall.auth.dto.role.RoleDTO;
 import com.dj.mall.common.constant.RoleConstant;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;

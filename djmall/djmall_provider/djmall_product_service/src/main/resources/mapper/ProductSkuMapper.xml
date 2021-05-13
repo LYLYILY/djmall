@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dj.mall.product.mapper.product.ProductSkuMapper">
+
+    <sql id="PRODUCT_SKU">
+        ps.id,
+        ps.product_id,
+        ps.sku_price,
+        ps.sku_count,
+        ps.sku_rate,
+        ps.sku_status,
+        ps.sku_name,
+        ps.business_id,
+        ps.is_default,
+        ps.update_time
+    </sql>
+
+    <select id="findProductSkuAll" resultType="com.dj.mall.product.mapper.bo.ProductSkuBO">
+        SELECT
+        <include refid="PRODUCT_SKU" />,
+        p.product_name AS product_name_show,
+        dpf.freight AS freight_show,
+        d.dict_name as product_type_show,
+        p.product_img as product_img_show,
+        p.product_disc as product_desc_show,
+        p.like_num as like_num_show
+        FROM
+        djmall_product_sku ps
+        LEFT JOIN djmall_product p ON ps.product_id = p.id
+        LEFT JOIN djmall_dict_product_freight dpf ON p.freight_id = dpf.id
+        LEFT JOIN djmall_dict d ON d.`code` = p.product_type
+        <where>
+            p.product_status = 'UP'
+            and ps.is_default = 'ISDEFAULT'
+            <if test="null != product.productNameShow and '' != product.productNameShow">
+                and p.product_name like "%"#{product.productNameShow}"%"
+            </if>
+            <if test="null != product.productTypeList">
+                and p.product_type in
+                <foreach collection="product.productTypeList" item="pp" open="(" close=")" separator=",">
+                    #{pp}
+                </foreach>
+            </if>
+            <if test="null != product.skuPriceMin">
+                and ps.sku_price &gt;= #{product.skuPriceMin}
+            </if>
+            <if test="null != product.skuPriceMax">
+                and ps.sku_price &lt;= #{product.skuPriceMax}
+            </if>
+        </where>
+    </select>
+
+    <!--根据sku属性值查商品-->
+    <select id="findProductBySkuName" resultType="com.dj.mall.product.mapper.bo.ProductSkuBO">
+        SELECT
+        <include refid="PRODUCT_SKU" />,
+        p.product_name AS productNameShow,
+        dpf.freight AS freightShow,
+        d.dict_name as productTypeShow,
+        p.product_img as productImgShow,
+        p.product_disc as productDescShow,
+        p.like_num as likeNumShow
+        FROM
+        djmall_product_sku ps
+        LEFT JOIN djmall_product p ON ps.product_id = p.id
+        LEFT JOIN djmall_dict_product_freight dpf ON p.freight_id = dpf.id
+        LEFT JOIN djmall_dict d ON d.`code` = p.product_type
+        where
+        ps.id = #{id}
+    </select>
+</mapper>

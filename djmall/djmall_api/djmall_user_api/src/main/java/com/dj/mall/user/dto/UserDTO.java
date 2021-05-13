@@ -77,4 +77,9 @@ public class UserDTO implements Serializable {
      */
     private String salt;
 
+    /**
+     * 用户头像
+     */
+    private String userPortrait;
+
 }

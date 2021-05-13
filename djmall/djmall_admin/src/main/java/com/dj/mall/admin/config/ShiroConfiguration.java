@@ -62,6 +62,13 @@ public class ShiroConfiguration {
         filters.put("/user/checkUserEmail", "anon");
         filters.put("/user/checkUserPhone", "anon");
         filters.put("/user/getSalt", "anon");
+        filters.put("/user/updateStatus1/**", "anon");
+        filters.put("/user/toRestPwd/**", "anon");
+        filters.put("/user/restUserPwd", "anon");
+        filters.put("/user/toForGetPwd", "anon");
+        filters.put("/user/getVerifCode", "anon");
+        filters.put("/user/updatePwd", "anon");
+        filters.put("/user/getCode", "anon");
         filters.put("/static/**", "anon");
         filters.put("/**", "authc"); // authc 表示必须认证才可访问
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filters);

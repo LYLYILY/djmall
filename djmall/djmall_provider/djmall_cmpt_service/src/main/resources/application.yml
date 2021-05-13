@@ -1,0 +1,42 @@
+spring:
+  mail:
+    host: smtp.163.com #SMTP服务器地址 smtp.qq.com
+    username: ly17696592601@163.com #登陆账号
+    password: KOZWTPRPISCVDKEK #登陆密码（或授权码）
+    properties:
+      from: ly17696592601@163.com #邮件发信人（即真实邮箱）
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/djmall_2003?characterEncoding=UTF-8&useOldAliasMetadataBehavior=true&useSSL=false
+  rabbitmq:
+    host: 192.168.118.140
+    port: 5672
+    username: admin
+    password: 123456
+    virtual-host: /
+    connection-timeout: 60000
+
+# Dubbo
+dubbo:
+  application:
+    name: cmpt-service # 应用名
+    qos-enable: false # 关闭在线调试
+  registry:
+    address: zookeeper://localhost:2181 # 注册中心地址
+  protocol:
+    name: dubbo # 协议名
+    port: 20886 # 服务端口
+  consumer:
+    check: false
+    timeout: 60000
+
+# 日志
+logging:
+  level:
+    com.dj.mall.cmpt.mapper:
+      debug
+
+user:
+  active: http://localhost:8080/admin/user/updateStatus1/%s

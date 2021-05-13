@@ -1,7 +1,7 @@
 package com.dj.mall.auth.api.resource;
 
 
-import com.dj.mall.auth.dto.ResourceDTO;
+import com.dj.mall.auth.dto.resource.ResourceDTO;
 import com.dj.mall.common.base.BusinessException;
 
 import java.util.List;
